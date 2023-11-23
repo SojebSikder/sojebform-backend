@@ -1,0 +1,288 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Organization {
+  id         Int       @id @default(autoincrement())
+  created_at DateTime  @default(now())
+  updated_at DateTime  @default(now())
+  deleted_at DateTime?
+  status     Int?      @default(1)
+
+  name         String?
+  phone_number String?
+  website      String?
+
+  // trial information
+  trial_end_at DateTime?
+
+  users              User[]
+  roles              Role[]
+  Workspace          Workspace[]
+  WorkspaceUser      WorkspaceUser[]
+  Subscription       Subscription[]
+  PaymentTransaction PaymentTransaction[]
+
+  @@map("organizations")
+}
+
+// User table
+model User {
+  id         Int       @id @default(autoincrement())
+  created_at DateTime  @default(now())
+  updated_at DateTime  @default(now())
+  deleted_at DateTime?
+  status     Int?      @default(1)
+
+  last_logged_in DateTime?
+
+  email    String? @unique
+  username String? @unique
+  fname    String? @db.VarChar(255)
+  lname    String? @db.VarChar(255)
+  password String? @db.VarChar(255)
+  avatar   String?
+
+  is_admin           Int?                 @default(0) // 0 = false, 1 = true
+  Ucode              Ucode[]
+  Organization       Organization?        @relation(fields: [organization_id], references: [id])
+  organization_id    Int?
+  RoleUser           RoleUser[]
+  WorkspaceUser      WorkspaceUser[]
+  Subscription       Subscription[]
+  PaymentTransaction PaymentTransaction[]
+
+  @@map("users")
+}
+
+model Ucode {
+  id         Int      @id @default(autoincrement())
+  created_at DateTime @default(now())
+  updated_at DateTime @default(now())
+  status     Int?     @default(1)
+
+  user_id Int?
+  user    User? @relation(fields: [user_id], references: [id])
+
+  token      String    @db.Text
+  email      String
+  expired_at DateTime?
+
+  @@map("ucodes")
+}
+
+// Store list of Roles
+model Role {
+  id         Int       @id @default(autoincrement())
+  created_at DateTime  @default(now())
+  updated_at DateTime  @default(now())
+  deleted_at DateTime?
+  status     Int?      @default(1)
+
+  title String?
+  name  String?
+
+  tenant_id Int?
+  tenant    Organization? @relation(fields: [tenant_id], references: [id], onDelete: Cascade)
+
+  workspace_id Int?
+  workspace    Workspace? @relation(fields: [workspace_id], references: [id], onDelete: Cascade)
+
+  permission_roles PermissionRole[]
+  role_users       RoleUser[]
+  permissions      Permission[]
+
+  @@map("roles")
+}
+
+// Store List of permissions
+model Permission {
+  id         Int       @id @default(autoincrement())
+  created_at DateTime  @default(now())
+  updated_at DateTime  @default(now())
+  deleted_at DateTime?
+  status     Int?      @default(1)
+
+  title            String?
+  action           String?
+  subject          String?
+  conditions       String?          @db.Text
+  fields           String?          @db.Text
+  permission_roles PermissionRole[]
+  roles            Role[]
+
+  @@map("permissions")
+}
+
+// permission and role relationship
+model PermissionRole {
+  // id         Int      @id @default(autoincrement())
+  created_at DateTime @default(now())
+  updated_at DateTime @default(now())
+
+  permission_id Int
+  permission    Permission? @relation(fields: [permission_id], references: [id], onDelete: Cascade)
+
+  role_id Int
+  role    Role? @relation(fields: [role_id], references: [id], onDelete: Cascade)
+
+  @@id([permission_id, role_id])
+  @@map("permission_roles")
+}
+
+// role and user relationship
+model RoleUser {
+  // id         Int      @id @default(autoincrement())
+  created_at DateTime @default(now())
+  updated_at DateTime @default(now())
+
+  role_id Int
+  role    Role? @relation(fields: [role_id], references: [id], onDelete: Cascade)
+
+  user_id Int
+  user    User? @relation(fields: [user_id], references: [id], onDelete: Cascade)
+
+  @@id([role_id, user_id])
+  @@map("role_users")
+}
+
+// just for example
+// model Note {
+//   id         Int       @id @default(autoincrement())
+//   created_at DateTime  @default(now())
+//   updated_at DateTime  @default(now())
+//   deleted_at DateTime?
+//   status     Int?      @default(1)
+
+//   title String?
+//   body  String? @db.Text
+
+//   tenant_id Int?
+//   tenant    Organization? @relation(fields: [tenant_id], references: [id], onDelete: Cascade)
+
+//   @@map("notes")
+// }
+// ------------------ workspace ---------------
+// workspace
+model Workspace {
+  id         Int       @id @default(autoincrement())
+  created_at DateTime  @default(now())
+  updated_at DateTime  @default(now())
+  deleted_at DateTime?
+  status     Int?      @default(1)
+
+  // workspace name
+  name     String
+  timezone String?
+
+  tenant_id Int?
+  tenant    Organization? @relation(fields: [tenant_id], references: [id], onDelete: Cascade)
+
+  workspace_users WorkspaceUser[]
+
+  roles Role[]
+
+  @@map("workspaces")
+}
+
+// workspace and user relationship
+// store workspace team member
+model WorkspaceUser {
+  // id         Int      @id @default(autoincrement())
+  created_at DateTime @default(now())
+  updated_at DateTime @default(now())
+
+  workspace_id Int
+  workspace    Workspace? @relation(fields: [workspace_id], references: [id], onDelete: Cascade)
+
+  user_id Int
+  user    User? @relation(fields: [user_id], references: [id], onDelete: Cascade)
+
+  tenant_id Int
+  tenant    Organization? @relation(fields: [tenant_id], references: [id], onDelete: Cascade)
+
+  @@id([workspace_id, user_id])
+  @@map("workspace_users")
+}
+
+// subscription model
+// list of plans
+model Plan {
+  id         Int      @id @default(autoincrement())
+  created_at DateTime @default(now())
+  updated_at DateTime @default(now())
+  status     Int?     @default(1)
+  sort_order Int?     @default(0)
+
+  name             String
+  // stripe product price id
+  gateway_price_id String?
+  price_per_month  Decimal
+
+  // Number of user or employee,
+  // that can added on platform
+  user_limit Int?
+
+  subscriptions Subscription[]
+
+  @@map("plans")
+}
+
+// user subscription
+model Subscription {
+  id         Int      @id @default(autoincrement())
+  created_at DateTime @default(now())
+  updated_at DateTime @default(now())
+  status     Int?     @default(1)
+
+  // stripe subscription id
+  gateway_subscription_id String?
+
+  tenant_id Int
+  tenant    Organization? @relation(fields: [tenant_id], references: [id], onDelete: Cascade)
+
+  plan_id Int
+  plan    Plan? @relation(fields: [plan_id], references: [id], onDelete: Cascade)
+
+  start_at DateTime
+  end_at   DateTime
+
+  payment_method String?
+  user_id        Int?
+  User           User?   @relation(fields: [user_id], references: [id])
+
+  @@map("subscriptions")
+}
+
+// This table used to store organization
+// subscription transactions
+model PaymentTransaction {
+  id         Int      @id @default(autoincrement())
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+
+  // available values:
+  // plan
+  transaction_type     String?
+  transaction_id       String?  @db.Text
+  // e.g. stripe
+  transaction_provider String?
+  amount               Decimal?
+  currency             String?
+
+  user_id Int?
+  User    User? @relation(fields: [user_id], references: [id])
+
+  tenant_id Int
+  tenant    Organization? @relation(fields: [tenant_id], references: [id], onDelete: Cascade)
+
+  @@map("payment_transactions")
+}
