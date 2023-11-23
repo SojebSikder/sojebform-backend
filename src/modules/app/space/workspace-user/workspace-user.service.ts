@@ -40,36 +40,6 @@ export class WorkspaceUserService extends PrismaClient {
           select: {
             id: true,
             name: true,
-            workspace_channels: {
-              where: {
-                tenant_id: tenant_id,
-              },
-              include: {
-                conversations: {
-                  where: {
-                    AND: [
-                      {
-                        is_open: true,
-                      },
-                      {
-                        tenant_id: tenant_id,
-                      },
-                    ],
-                  },
-                  include: {
-                    contact: {
-                      select: {
-                        id: true,
-                        fname: true,
-                        lname: true,
-                        email: true,
-                        assignee_id: true,
-                      },
-                    },
-                  },
-                },
-              },
-            },
           },
         },
         user: {

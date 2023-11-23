@@ -51,13 +51,17 @@ model User {
   password String? @db.VarChar(255)
   avatar   String?
 
-  is_admin           Int?                 @default(0) // 0 = false, 1 = true
-  Ucode              Ucode[]
-  Organization       Organization?        @relation(fields: [organization_id], references: [id])
-  organization_id    Int?
-  RoleUser           RoleUser[]
-  WorkspaceUser      WorkspaceUser[]
-  Subscription       Subscription[]
+  // billing id. e.g. stripe customer id
+  billing_id String?
+
+  is_admin  Int?          @default(0) // 0 = false, 1 = true
+  tenant    Organization? @relation(fields: [tenant_id], references: [id])
+  tenant_id Int?
+
+  ucodes             Ucode[]
+  role_users         RoleUser[]
+  workspace_users    WorkspaceUser[]
+  subscriptions      Subscription[]
   PaymentTransaction PaymentTransaction[]
 
   @@map("users")

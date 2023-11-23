@@ -10,9 +10,7 @@ export class FacebookStrategy extends PassportStrategy(Strategy, 'facebook') {
       clientID: appConfig().auth.facebook.app_id,
       clientSecret: appConfig().auth.facebook.app_secret,
       callbackURL: appConfig().auth.facebook.callback,
-      // scope: 'email',
-      // profileFields: ['emails', 'name'],
-      scope: ['email', 'business_management', 'whatsapp_business_management'],
+      scope: 'email',
       profileFields: ['emails', 'name'],
     });
   }

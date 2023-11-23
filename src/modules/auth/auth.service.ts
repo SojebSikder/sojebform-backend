@@ -10,7 +10,10 @@ import { StripeMethod } from '../../common/lib/Payment/stripe/Stripe';
 
 @Injectable()
 export class AuthService extends PrismaClient {
-  constructor(private jwtService: JwtService, private prisma: PrismaService) {
+  constructor(
+    private jwtService: JwtService,
+    private prisma: PrismaService,
+  ) {
     super();
   }
 

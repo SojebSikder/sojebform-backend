@@ -32,7 +32,6 @@ export class UserService extends PrismaClient {
         username: true,
         email: true,
         avatar: true,
-        availability: true,
         tenant_id: true,
         tenant: {
           select: {
@@ -46,13 +45,6 @@ export class UserService extends PrismaClient {
             workspace_id: true,
             workspace: {
               select: {
-                workspace_channels: {
-                  select: {
-                    id: true,
-                    channel_name: true,
-                    channel_type: true,
-                  },
-                },
                 id: true,
                 name: true,
               },
