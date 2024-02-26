@@ -48,9 +48,9 @@ export class UserController {
   async create(@Req() req, @Body() createUserDto: CreateUserDto) {
     const user = await this.userService.create(createUserDto, req.user.userId);
     if (user) {
-      if (user.error) {
+      if (!user.success) {
         return {
-          error: true,
+          success: false,
           message: user.message,
         };
       }
@@ -60,7 +60,7 @@ export class UserController {
       };
     } else {
       return {
-        error: true,
+        success: false,
         message: user.message,
       };
     }
@@ -78,7 +78,7 @@ export class UserController {
       };
     } else {
       return {
-        error: true,
+        success: false,
       };
     }
   }
@@ -124,7 +124,7 @@ export class UserController {
       };
     } else {
       return {
-        error: true,
+        success: false,
         message: 'User not found',
       };
     }
@@ -143,12 +143,12 @@ export class UserController {
     const user = await this.userService.update(+id, userId, updateUserDto);
     if (user) {
       return {
-        success: true,
+        success: false,
         message: 'Updated successfully',
       };
     } else {
       return {
-        error: true,
+        success: false,
         message: 'User not updated',
       };
     }
@@ -196,24 +196,24 @@ export class UserController {
       if (!password) {
         if (password.length < 6) {
           return {
-            error: true,
+            success: false,
             message: 'Password must be at least 6 digit long!',
           };
         }
         return {
-          error: true,
+          success: false,
           message: 'Password not provided!',
         };
       }
       if (!email) {
         return {
-          error: true,
+          success: false,
           message: 'Email not provided!',
         };
       }
       if (!token) {
         return {
-          error: true,
+          success: false,
           message: 'Token not provided!',
         };
       }
@@ -235,20 +235,20 @@ export class UserController {
           };
         } else {
           return {
-            error: true,
+            success: false,
             message: 'Password not changed',
           };
         }
       } else {
         return {
-          error: true,
+          success: false,
           message: 'Token invalid',
         };
       }
     } catch (error) {
       throw error;
       // return {
-      //   error: true,
+      //   success: false,
       //   message: 'Something went wrong :(',
       // };
     }

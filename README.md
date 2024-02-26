@@ -2,7 +2,7 @@
 
 No-code form builder backend system
 
-Frontend part: (Will be here soon)
+Frontend part: (Link will be here soon)
 
 ## Installation
 

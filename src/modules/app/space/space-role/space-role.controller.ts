@@ -40,12 +40,12 @@ export class SpaceRoleController {
     );
     if (role) {
       return {
-        success: true,
+        success: false,
         message: 'Role created successfully',
       };
     } else {
       return {
-        error: true,
+        success: false,
         message: 'Role not created',
       };
     }
@@ -97,12 +97,12 @@ export class SpaceRoleController {
     );
     if (role) {
       return {
-        success: true,
+        success: false,
         message: 'Updated successfully',
       };
     } else {
       return {
-        error: true,
+        success: false,
         message: 'Not updated',
       };
     }
@@ -118,12 +118,12 @@ export class SpaceRoleController {
     const role = await this.spaceRoleService.remove(+id, user_id, workspace_id);
     if (role) {
       return {
-        success: true,
+        success: false,
         message: 'Deleted successfully',
       };
     } else {
       return {
-        error: true,
+        success: false,
         message: 'Not deleted',
       };
     }

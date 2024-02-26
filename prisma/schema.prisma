@@ -63,6 +63,8 @@ model User {
   workspace_users    WorkspaceUser[]
   subscriptions      Subscription[]
   PaymentTransaction PaymentTransaction[]
+  FormTemplate       FormTemplate[]
+  Form               Form[]
 
   @@map("users")
 }
@@ -192,7 +194,9 @@ model Workspace {
 
   workspace_users WorkspaceUser[]
 
-  roles Role[]
+  roles        Role[]
+  Form         Form[]
+  FormTemplate FormTemplate[]
 
   @@map("workspaces")
 }
@@ -283,10 +287,121 @@ model PaymentTransaction {
   currency             String?
 
   user_id Int?
-  User    User? @relation(fields: [user_id], references: [id])
+  user    User? @relation(fields: [user_id], references: [id])
 
   tenant_id Int
   tenant    Organization? @relation(fields: [tenant_id], references: [id], onDelete: Cascade)
 
   @@map("payment_transactions")
+}
+
+// Forms
+model Form {
+  id         Int       @id @default(autoincrement())
+  created_at DateTime  @default(now())
+  updated_at DateTime  @default(now())
+  deleted_at DateTime?
+  status     Int?      @default(1)
+
+  title               String?
+  slug                String?   @unique
+  properties          String?   @db.Text
+  notifies            Int?      @default(0) // 0 = false, 1 = true
+  description         String?   @db.Text
+  submit_button_text  String?   @default("Submit")
+  re_fillable         Int?      @default(0) // 0 = false, 1 = true
+  re_fill_button_text String?   @default("Fill Again")
+  color               String?   @default("#3B82F6")
+  submitted_text      String?   @default("Thank you for submitting the form.")
+  expires_at          DateTime?
+  expiration_text     String?   @default("This form has expired.")
+  is_public           Int?      @default(0) // 0 = false, 1 = true
+
+  editable_submissions             Int?    @default(0) // 0 = false, 1 = true
+  editable_submissions_button_text String? @default("Edit submission")
+
+  max_submissions_count        Int?
+  max_submissions_reached_text String? @default("This form has reached its maximum number of submissions.")
+
+  notification_subject String? @default("We saved your answers")
+  notification_body    String? @default("This is a confirmation that your submission was successfully saved.")
+  password             String?
+
+  user_id Int?
+  user    User? @relation(fields: [user_id], references: [id])
+
+  workspace_id   Int
+  workspace      Workspace?       @relation(fields: [workspace_id], references: [id], onDelete: Cascade)
+  FormSubmission FormSubmission[]
+  FormView       FormView[]
+  FormStatistics FormStatistics[]
+
+  @@map("forms")
+}
+
+model FormSubmission {
+  id         Int       @id @default(autoincrement())
+  created_at DateTime  @default(now())
+  updated_at DateTime  @default(now())
+  deleted_at DateTime?
+  status     Int?      @default(1)
+
+  data String? @db.Text
+
+  form_id Int
+  form    Form? @relation(fields: [form_id], references: [id], onDelete: Cascade)
+
+  @@map("form_submissions")
+}
+
+model FormView {
+  id         Int       @id @default(autoincrement())
+  created_at DateTime  @default(now())
+  updated_at DateTime  @default(now())
+  deleted_at DateTime?
+  status     Int?      @default(1)
+
+  data String? @db.Text
+
+  form_id Int
+  form    Form? @relation(fields: [form_id], references: [id], onDelete: Cascade)
+
+  @@map("form_views")
+}
+
+model FormStatistics {
+  id         Int       @id @default(autoincrement())
+  created_at DateTime  @default(now())
+  updated_at DateTime  @default(now())
+  deleted_at DateTime?
+  status     Int?      @default(1)
+
+  data String? @db.Text
+
+  form_id Int
+  form    Form? @relation(fields: [form_id], references: [id], onDelete: Cascade)
+
+  @@map("form_statistics")
+}
+
+model FormTemplate {
+  id         Int       @id @default(autoincrement())
+  created_at DateTime  @default(now())
+  updated_at DateTime  @default(now())
+  deleted_at DateTime?
+  status     Int?      @default(1)
+
+  title       String?
+  slug        String? @unique
+  description String? @db.Text
+  structure   String? @db.Text
+  questions   String? @db.Text
+
+  user_id Int?
+  User    User? @relation(fields: [user_id], references: [id])
+
+  workspace_id Int
+  workspace    Workspace? @relation(fields: [workspace_id], references: [id], onDelete: Cascade)
+
+  @@map("form_template")
 }

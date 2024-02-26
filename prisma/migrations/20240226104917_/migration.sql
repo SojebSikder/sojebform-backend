@@ -173,6 +173,96 @@ CREATE TABLE "payment_transactions" (
 );
 
 -- CreateTable
+CREATE TABLE "forms" (
+    "id" SERIAL NOT NULL,
+    "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updated_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "deleted_at" TIMESTAMP(3),
+    "status" INTEGER DEFAULT 1,
+    "title" TEXT,
+    "slug" TEXT,
+    "properties" TEXT,
+    "notifies" INTEGER DEFAULT 0,
+    "description" TEXT,
+    "submit_button_text" TEXT DEFAULT 'Submit',
+    "re_fillable" INTEGER DEFAULT 0,
+    "re_fill_button_text" TEXT DEFAULT 'Fill Again',
+    "color" TEXT DEFAULT '#3B82F6',
+    "submitted_text" TEXT DEFAULT 'Thank you for submitting the form.',
+    "expires_at" TIMESTAMP(3),
+    "expiration_text" TEXT DEFAULT 'This form has expired.',
+    "is_public" INTEGER DEFAULT 0,
+    "editable_submissions" INTEGER DEFAULT 0,
+    "editable_submissions_button_text" TEXT DEFAULT 'Edit submission',
+    "max_submissions_count" INTEGER,
+    "max_submissions_reached_text" TEXT DEFAULT 'This form has reached its maximum number of submissions.',
+    "notification_subject" TEXT DEFAULT 'We saved your answers',
+    "notification_body" TEXT DEFAULT 'This is a confirmation that your submission was successfully saved.',
+    "password" TEXT,
+    "user_id" INTEGER,
+    "workspace_id" INTEGER NOT NULL,
+
+    CONSTRAINT "forms_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "form_submissions" (
+    "id" SERIAL NOT NULL,
+    "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updated_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "deleted_at" TIMESTAMP(3),
+    "status" INTEGER DEFAULT 1,
+    "data" TEXT,
+    "form_id" INTEGER NOT NULL,
+
+    CONSTRAINT "form_submissions_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "form_views" (
+    "id" SERIAL NOT NULL,
+    "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updated_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "deleted_at" TIMESTAMP(3),
+    "status" INTEGER DEFAULT 1,
+    "data" TEXT,
+    "form_id" INTEGER NOT NULL,
+
+    CONSTRAINT "form_views_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "form_statistics" (
+    "id" SERIAL NOT NULL,
+    "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updated_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "deleted_at" TIMESTAMP(3),
+    "status" INTEGER DEFAULT 1,
+    "data" TEXT,
+    "form_id" INTEGER NOT NULL,
+
+    CONSTRAINT "form_statistics_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "form_template" (
+    "id" SERIAL NOT NULL,
+    "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updated_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "deleted_at" TIMESTAMP(3),
+    "status" INTEGER DEFAULT 1,
+    "title" TEXT,
+    "slug" TEXT,
+    "description" TEXT,
+    "structure" TEXT,
+    "questions" TEXT,
+    "user_id" INTEGER,
+    "workspace_id" INTEGER NOT NULL,
+
+    CONSTRAINT "form_template_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
 CREATE TABLE "_PermissionToRole" (
     "A" INTEGER NOT NULL,
     "B" INTEGER NOT NULL
@@ -183,6 +273,12 @@ CREATE UNIQUE INDEX "users_email_key" ON "users"("email");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "users_username_key" ON "users"("username");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "forms_slug_key" ON "forms"("slug");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "form_template_slug_key" ON "form_template"("slug");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "_PermissionToRole_AB_unique" ON "_PermissionToRole"("A", "B");
@@ -240,6 +336,27 @@ ALTER TABLE "payment_transactions" ADD CONSTRAINT "payment_transactions_user_id_
 
 -- AddForeignKey
 ALTER TABLE "payment_transactions" ADD CONSTRAINT "payment_transactions_tenant_id_fkey" FOREIGN KEY ("tenant_id") REFERENCES "organizations"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "forms" ADD CONSTRAINT "forms_user_id_fkey" FOREIGN KEY ("user_id") REFERENCES "users"("id") ON DELETE SET NULL ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "forms" ADD CONSTRAINT "forms_workspace_id_fkey" FOREIGN KEY ("workspace_id") REFERENCES "workspaces"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "form_submissions" ADD CONSTRAINT "form_submissions_form_id_fkey" FOREIGN KEY ("form_id") REFERENCES "forms"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "form_views" ADD CONSTRAINT "form_views_form_id_fkey" FOREIGN KEY ("form_id") REFERENCES "forms"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "form_statistics" ADD CONSTRAINT "form_statistics_form_id_fkey" FOREIGN KEY ("form_id") REFERENCES "forms"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "form_template" ADD CONSTRAINT "form_template_user_id_fkey" FOREIGN KEY ("user_id") REFERENCES "users"("id") ON DELETE SET NULL ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "form_template" ADD CONSTRAINT "form_template_workspace_id_fkey" FOREIGN KEY ("workspace_id") REFERENCES "workspaces"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "_PermissionToRole" ADD CONSTRAINT "_PermissionToRole_A_fkey" FOREIGN KEY ("A") REFERENCES "permissions"("id") ON DELETE CASCADE ON UPDATE CASCADE;

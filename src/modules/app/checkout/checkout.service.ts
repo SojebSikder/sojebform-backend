@@ -62,7 +62,7 @@ export class CheckoutService extends PrismaClient {
       }
     } else {
       return {
-        error: true,
+        success: false,
         message: 'Plan not found',
       };
     }

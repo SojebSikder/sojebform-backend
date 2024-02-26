@@ -29,6 +29,7 @@ import { TenantModule } from './modules/su-admin/tenant/tenant.module';
 import { SocketModule } from './providers/socket/socket.module';
 import { LoggerMiddleware } from './common/middleware/logger.middleware';
 import { RawBodyMiddleware } from './common/middleware/rawBody.middleware';
+import { FormModule } from './modules/app/form/form.module';
 
 @Module({
   imports: [
@@ -76,6 +77,7 @@ import { RawBodyMiddleware } from './common/middleware/rawBody.middleware';
     WorkspaceModule,
     PlanModule,
     CheckoutModule,
+    FormModule,
   ],
   controllers: [AppController],
   providers: [

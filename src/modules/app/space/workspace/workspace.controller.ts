@@ -38,12 +38,12 @@ export class WorkspaceController {
     );
     if (workspace) {
       return {
-        success: true,
+        success: false,
         message: 'Workspace created successfully',
       };
     } else {
       return {
-        error: true,
+        success: false,
         message: 'Workspace not created',
       };
     }
@@ -73,7 +73,7 @@ export class WorkspaceController {
       };
     } else {
       return {
-        error: true,
+        success: false,
         message: 'Workspace not exist',
       };
     }
@@ -96,12 +96,12 @@ export class WorkspaceController {
 
     if (workspace) {
       return {
-        success: true,
+        success: false,
         message: 'Updated successfully',
       };
     } else {
       return {
-        error: true,
+        success: false,
         message: 'Not updated',
       };
     }
@@ -116,12 +116,12 @@ export class WorkspaceController {
 
     if (workspace) {
       return {
-        success: true,
+        success: false,
         message: 'Deleted successfully',
       };
     } else {
       return {
-        success: true,
+        success: false,
         message: 'Not deleted',
       };
     }

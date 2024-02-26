@@ -83,7 +83,7 @@ export class UserService extends PrismaClient {
 
     if (userEmailExist) {
       return {
-        error: true,
+        success: false,
         statusCode: 401,
         message: 'Email already exist',
       };
@@ -133,12 +133,12 @@ export class UserService extends PrismaClient {
 
       return {
         data: member,
-        success: true,
+        success: false,
         message: 'User has been invited successfully',
       };
     } else {
       return {
-        error: true,
+        success: false,
         message: 'User not created. something went wrong',
       };
     }
