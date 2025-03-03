@@ -511,8 +511,8 @@ model Form {
   deleted_at DateTime?
   status     Int?      @default(1) @db.SmallInt
 
-  title String?
-  body  String? @db.Text
+  title       String?
+  description String? @db.Text
 
   fields    Field[]
   responses Response[]
