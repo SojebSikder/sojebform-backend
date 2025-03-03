@@ -34,6 +34,11 @@ export default () => ({
     salt: 10,
   },
 
+  jwt: {
+    secret: process.env.JWT_SECRET,
+    expiry: process.env.JWT_EXPIRY,
+  },
+
   mail: {
     host: process.env.MAIL_HOST || 'smtp.gmail.com',
     user: process.env.MAIL_USERNAME,
@@ -41,23 +46,36 @@ export default () => ({
     from: process.env.MAIL_FROM_NAME,
   },
 
-  auth: {
-    facebook: {
-      app_id: process.env.FACEBOOK_APP_ID,
-      app_secret: process.env.FACEBOOK_APP_SECRET,
-      callback: process.env.FACEBOOK_CALLBACK_URL,
-    },
-    shopify: {
-      app_id: process.env.SHOPIFY_APP_ID,
-      app_secret: process.env.SHOPIFY_APP_SECRET,
-    },
-  },
+  auth: {},
 
   payment: {
     stripe: {
-      publishable_key: process.env.STRIPE_PUBLISHABLE_KEY,
       secret_key: process.env.STRIPE_SECRET_KEY,
       webhook_secret: process.env.STRIPE_WEBHOOK_SECRET,
+    },
+  },
+
+  /**
+   * Storage directory
+   */
+  storageUrl: {
+    rootUrl: './public/storage',
+    rootUrlPublic: '/public/storage',
+    // storage directory
+    package: '/package/',
+    destination: '/destination/',
+    blog: '/blog/',
+    avatar: '/avatar/',
+    websiteInfo: '/website-info/',
+    // chat
+    attachment: '/attachment/',
+  },
+
+  defaultUser: {
+    system: {
+      username: process.env.SYSTEM_USERNAME,
+      email: process.env.SYSTEM_EMAIL,
+      password: process.env.SYSTEM_PASSWORD,
     },
   },
 });

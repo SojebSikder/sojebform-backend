@@ -1,10 +1,15 @@
 import { Injectable, NestMiddleware } from '@nestjs/common';
-import * as bodyParser from 'body-parser';
+import { Request, Response, NextFunction } from 'express';
 
 @Injectable()
 export class RawBodyMiddleware implements NestMiddleware {
-  use(req: any, res: any, next: () => void) {
-    bodyParser.raw({ type: '*/*' })(req, res, next);
-    // next();
+  use(req: Request, res: Response, next: NextFunction) {
+    req.rawBody = '';
+    req.on('data', (chunk) => {
+      req.rawBody += chunk;
+    });
+    req.on('end', () => {
+      next();
+    });
   }
 }

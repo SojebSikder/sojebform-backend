@@ -11,9 +11,20 @@ export class S3Adapter implements IStorage {
 
   constructor(config: DiskOption) {
     this._config = config;
+    const awsConfig = {
+      endpoint: this._config.connection.awsEndpoint,
+      region: this._config.connection.awsDefaultRegion,
+      credentials: {
+        accessKeyId: this._config.connection.awsAccessKeyId,
+        secretAccessKey: this._config.connection.awsSecretAccessKey,
+      },
+    };
+    if (this._config.connection.minio) {
+      // s3ForcePathStyle: true, // Required for MinIO
+      awsConfig['s3ForcePathStyle'] = true;
+    }
     this.s3 = new AWS.S3({
-      accessKeyId: this._config.connection.awsAccessKeyId,
-      secretAccessKey: this._config.connection.awsSecretAccessKey,
+      ...awsConfig,
     });
   }
 
@@ -21,11 +32,35 @@ export class S3Adapter implements IStorage {
    * returns object url
    *
    * https://[bucketname].s3.[region].amazonaws.com/[object]
+   * and for minio
+   * http://[endpoint]/[bucketname]/[object]
    * @param key
    * @returns
    */
-  url(key: string) {
+
+  url(key: string): string {
+    if (this._config.connection.minio) {
+      return `${this._config.connection.awsEndpoint}/${this._config.connection.awsBucket}/${key}`;
+    }
     return `${this._config.connection.awsBucket}.s3.${this._config.connection.awsDefaultRegion}.amazonaws.com/${key}`;
+  }
+
+  /**
+   * check if file exists
+   * @param key
+   * @returns
+   */
+  async isExists(key: string): Promise<boolean> {
+    try {
+      const params = { Bucket: this._config.connection.awsBucket, Key: key };
+      await this.s3.headObject(params).promise();
+      return true;
+    } catch (error) {
+      if ((error as AWS.AWSError).code === 'NotFound') {
+        return false;
+      }
+      throw error;
+    }
   }
 
   /**
@@ -37,8 +72,8 @@ export class S3Adapter implements IStorage {
       const params = { Bucket: this._config.connection.awsBucket, Key: key };
       const data = this.s3.getObject(params).createReadStream();
       return data;
-    } catch (err) {
-      console.log(err);
+    } catch (error) {
+      throw new Error(`Failed to get object ${key}: ${error}`);
     }
   }
 
@@ -47,18 +82,20 @@ export class S3Adapter implements IStorage {
    * @param key
    * @param value
    */
-  async put(key: string, value: any) {
+  async put(
+    key: string,
+    value: Buffer | Uint8Array | string,
+  ): Promise<AWS.S3.ManagedUpload.SendData> {
     try {
-      const upload = await this.s3
-        .upload({
-          Bucket: this._config.connection.awsBucket,
-          Key: key,
-          Body: value,
-        })
-        .promise();
+      const params = {
+        Bucket: this._config.connection.awsBucket,
+        Key: key,
+        Body: value,
+      };
+      const upload = await this.s3.upload(params).promise();
       return upload;
-    } catch (err) {
-      console.log(err);
+    } catch (error) {
+      throw error;
     }
   }
 
@@ -66,20 +103,16 @@ export class S3Adapter implements IStorage {
    * delete data
    * @param key
    */
-  async delete(key: string) {
+  async delete(key: string): Promise<boolean> {
     try {
       const params = { Bucket: this._config.connection.awsBucket, Key: key };
-      this.s3.deleteObject(params, function (err, data) {
-        if (err) {
-          console.log(err, err.stack);
-          return 0;
-        } // error
-        else {
-          return 1;
-        } // deleted
-      });
-    } catch (err) {
-      console.log(err);
+      await this.s3.deleteObject(params).promise();
+      return true;
+    } catch (error) {
+      if ((error as AWS.AWSError).code === 'NotFound') {
+        return false;
+      }
+      throw error;
     }
   }
 }

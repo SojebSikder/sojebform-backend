@@ -1,27 +1,32 @@
 # Base image
-FROM node:18
+FROM node:20
 
 # Create app directory
-WORKDIR /app
+WORKDIR /usr/src/app
 
-# package.json AND pnpm-lock.yaml are copied
-COPY package.json pnpm-lock.yaml ./
+# A wildcard is used to ensure both package.json AND package-lock.json are copied
+COPY package*.json ./
+COPY yarn.lock ./
 
-# Install dependencies
-RUN npm install -g pnpm
-RUN pnpm install
+# Install app dependencies
+RUN yarn install
 
 # Bundle app source
 COPY . .
 
-# Copy the .env file
+# Copy the .env and .env.development files
 COPY .env ./
 
-# Build the app. Create a "dist" folder with production build
-RUN pnpm build
+# prisma generate
+RUN npx prisma generate
+
+# Creates a "dist" folder with the production build
+# RUN yarn build
 
 # Expose the port on which the app will run
 EXPOSE 4000
 
-# Run the app using production build
-CMD [ "pnpm", "start:prod" ]
+# Start the server using the production build
+# CMD ["yarn", "start:prod"]
+# Start the server in dev mode
+CMD ["yarn", "start:dev-swc"]

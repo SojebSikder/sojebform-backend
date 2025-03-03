@@ -1,46 +1,84 @@
-## Description
+# Description
 
-No-code form builder backend system
+backend system created using nestjs
 
-Frontend part: (Link will be here soon)
+## Config
+
+Stripe webhook:
+
+```
+http://{domain_name}/api/payment/stripe/webhook
+```
+
+for development run stripe cli:
+
+```
+stripe listen --forward-to localhost:4000/api/payment/stripe/webhook
+```
+
+trigger a event for testing:
+
+```
+stripe trigger payment_intent.succeeded
+```
 
 ## Installation
 
-```bash
-pnpm install
+Install all dependencies
+
+```
+yarn install
 ```
 
-## Running the app
+## Setup
+
+Copy .env.example to .env and config according to your needs.
+
+Migrate database:
+
+```bash
+npx prisma migrate dev
+```
+
+Seed dummy data to database
+
+```
+yarn cmd seed
+```
+
+## Running:
 
 ```bash
 # development
-pnpm start
+yarn start
 
 # watch mode
-pnpm start:dev
+yarn start:dev
 
 # production mode
-pnpm start:prod
+yarn start:prod
 
 # watch mode with swc compiler (faster)
-pnpm start:dev-swc
+yarn start:dev-swc
 ```
 
-## Running using docker
+For docker:
+
 ```
 docker compose up
 ```
-To rebuild app:
-```
-docker compose up --build
-```
 
-## Used technology
+## Api documentation
+
+Swagger: http://{domain_name}/api/docs
+
+## Tech used
+
 - Typescript
 - Nest.js
 - Prisma
-- Postgresql
+- Postgres
 - Socket.io
 - Bullmq
 - Redis
-- etc
+- etc.

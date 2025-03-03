@@ -17,18 +17,19 @@ export class HasPlanGuard implements CanActivate {
       const userDetails = await UserRepository.getUserDetails(user_id);
 
       // check if trial has expired
-      if (userDetails.tenant.trial_end_at < DateHelper.now()) {
-        const tenantSubscriptionDetails =
-          await UserRepository.getSubscriptionDetails(user_id);
+      // if (userDetails.tenant.trial_end_at < DateHelper.now()) {
+      //   const tenantSubscriptionDetails =
+      //     await UserRepository.getSubscriptionDetails(user_id);
 
-        if (tenantSubscriptionDetails) {
-          return true;
-        } else {
-          throw new ForbiddenException('Access denied');
-        }
-      } else {
-        return true;
-      }
+      //   if (tenantSubscriptionDetails) {
+      //     return true;
+      //   } else {
+      //     throw new ForbiddenException('Access denied');
+      //   }
+      // } else {
+      //   return true;
+      // }
+      return true;
     } catch (error) {
       throw new ForbiddenException(error.message);
     }

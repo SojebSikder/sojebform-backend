@@ -1,35 +1,25 @@
 // external imports
 import { MiddlewareConsumer, Module } from '@nestjs/common';
+// import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
+// import { APP_GUARD } from '@nestjs/core';
 import { ConfigModule } from '@nestjs/config';
-import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
-import { APP_GUARD } from '@nestjs/core';
+// import { BullModule } from '@nestjs/bullmq';
 
 // internal imports
 import appConfig from './config/app.config';
-import { ThrottlerBehindProxyGuard } from './common/guard/throttler-behind-proxy.guard';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
-import { UrlGeneratorModule } from 'nestjs-url-generator';
-import { PrismaModule } from './providers/prisma/prisma.module';
-import { AuthModule } from './modules/auth/auth.module';
-import { AbilityModule } from './providers/ability/ability.module';
-import { MailModule } from './providers/mail/mail.module';
-import { CheckoutModule } from './modules/app/checkout/checkout.module';
-import { BillingModule } from './modules/app/organization/billing/billing.module';
-import { PlanModule } from './modules/app/plan/plan.module';
-import { ProfileModule } from './modules/app/profile/profile.module';
-import { PermissionModule } from './modules/app/space/permission/permission.module';
-import { SpaceRoleModule } from './modules/app/space/space-role/space-role.module';
-import { WorkspaceUserModule } from './modules/app/space/workspace-user/workspace-user.module';
-import { WorkspaceModule } from './modules/app/space/workspace/workspace.module';
-import { StripeModule } from './modules/app/stripe/stripe.module';
-import { UserModule } from './modules/app/user/user.module';
-import { ExampleModule } from './modules/example/example.module';
-import { TenantModule } from './modules/su-admin/tenant/tenant.module';
-import { SocketModule } from './providers/socket/socket.module';
 import { LoggerMiddleware } from './common/middleware/logger.middleware';
-import { RawBodyMiddleware } from './common/middleware/rawBody.middleware';
-import { FormModule } from './modules/app/form/form.module';
+import { AuthModule } from './modules/auth/auth.module';
+import { PrismaModule } from './prisma/prisma.module';
+// import { ThrottlerBehindProxyGuard } from './common/guard/throttler-behind-proxy.guard';
+import { AbilityModule } from './ability/ability.module';
+import { MailModule } from './mail/mail.module';
+import { ApplicationModule } from './modules/application/application.module';
+import { AdminModule } from './modules/admin/admin.module';
+import { BullModule } from '@nestjs/bullmq';
+import { ChatModule } from './modules/chat/chat.module';
+import { PaymentModule } from './modules/payment/payment.module';
 
 @Module({
   imports: [
@@ -37,66 +27,62 @@ import { FormModule } from './modules/app/form/form.module';
       isGlobal: true,
       load: [appConfig],
     }),
-    ThrottlerModule.forRoot({
-      // ttl: 60,
-      // limit: 10,
-      throttlers: [
-        {
-          name: 'default',
-          ttl: 60,
-          limit: 10,
-        },
-        {
-          name: 'user',
-          ttl: 60,
-          limit: 10,
-        },
-      ],
+    BullModule.forRoot({
+      connection: {
+        host: appConfig().redis.host,
+        password: appConfig().redis.password,
+        port: +appConfig().redis.port,
+      },
+      // redis: {
+      //   host: appConfig().redis.host,
+      //   password: appConfig().redis.password,
+      //   port: +appConfig().redis.port,
+      // },
     }),
-    UrlGeneratorModule.forRoot({
-      secret: appConfig().app.key,
-      appUrl: appConfig().app.url,
-    }),
+    // disabling throttling for dev
+    // ThrottlerModule.forRoot([
+    //   {
+    //     name: 'short',
+    //     ttl: 1000,
+    //     limit: 3,
+    //   },
+    //   {
+    //     name: 'medium',
+    //     ttl: 10000,
+    //     limit: 20,
+    //   },
+    //   {
+    //     name: 'long',
+    //     ttl: 60000,
+    //     limit: 100,
+    //   },
+    // ]),
     // General modules
     PrismaModule,
     AuthModule,
     AbilityModule,
     MailModule,
-    SocketModule,
-    // Super admin modules
-    TenantModule,
-    // app modules
-    UserModule,
-    ProfileModule,
-    WorkspaceUserModule,
-    PermissionModule,
-    StripeModule,
-    BillingModule,
-    SpaceRoleModule,
-    ExampleModule,
-    WorkspaceModule,
-    PlanModule,
-    CheckoutModule,
-    FormModule,
+    ApplicationModule,
+    AdminModule,
+    ChatModule,
+    PaymentModule,
   ],
   controllers: [AppController],
   providers: [
-    {
-      provide: APP_GUARD,
-      useClass: ThrottlerGuard,
-    },
-    {
-      provide: APP_GUARD,
-      useClass: ThrottlerBehindProxyGuard,
-    },
-
+    // disabling throttling for dev
+    // {
+    //   provide: APP_GUARD,
+    //   useClass: ThrottlerGuard,
+    // },
+    // disbling throttling for dev {
+    //   provide: APP_GUARD,
+    //   useClass: ThrottlerBehindProxyGuard,
+    // },
     AppService,
   ],
 })
 export class AppModule {
   configure(consumer: MiddlewareConsumer) {
     consumer.apply(LoggerMiddleware).forRoutes('*');
-    // for the raw body
-    consumer.apply(RawBodyMiddleware).forRoutes('*');
   }
 }
