@@ -11,7 +11,7 @@ import { FormService } from './form.service';
 import { CreateFormDto } from './dto/create-form.dto';
 import { UpdateFormDto } from './dto/update-form.dto';
 
-@Controller('form')
+@Controller('admin/form')
 export class FormController {
   constructor(private readonly formService: FormService) {}
 
