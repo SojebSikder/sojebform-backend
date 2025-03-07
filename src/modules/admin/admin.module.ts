@@ -6,6 +6,7 @@ import { PaymentTransactionModule } from './payment-transaction/payment-transact
 import { UserModule } from './user/user.module';
 import { NotificationModule } from './notification/notification.module';
 import { FormModule } from './form/form.module';
+import { ExampleModule } from './example/example.module';
 
 @Module({
   imports: [
@@ -16,6 +17,7 @@ import { FormModule } from './form/form.module';
     UserModule,
     NotificationModule,
     FormModule,
+    ExampleModule,
   ],
 })
 export class AdminModule {}

@@ -55,6 +55,12 @@ export default () => ({
     },
   },
 
+  openai: {
+    api_key: process.env.OPENAI_API_KEY,
+    base_url: process.env.OPENAI_BASE_URL,
+    model: process.env.OPENAI_MODEL,
+  },
+
   /**
    * Storage directory
    */

@@ -19,7 +19,7 @@ export class FormController {
 
   @Get(':id')
   findOne(@Param('id') id: string) {
-    return this.formService.findOne(+id);
+    return this.formService.findOne(id);
   }
 
   @Patch(':id')
