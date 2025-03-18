@@ -14,7 +14,7 @@ export class FormService extends PrismaClient {
     try {
       const form = await this.prisma.form.create({
         data: {
-          title: createFormDto.title,
+          name: createFormDto.name,
           description: createFormDto.description,
           elements: {
             // create: JSON.parse(createFormDto.elements),
@@ -98,7 +98,7 @@ export class FormService extends PrismaClient {
       const form = await this.prisma.form.update({
         where: { id },
         data: {
-          title: updateFormDto.title,
+          name: updateFormDto.name,
           description: updateFormDto.description,
           elements: {
             // update: JSON.parse(updateFormDto.elements),

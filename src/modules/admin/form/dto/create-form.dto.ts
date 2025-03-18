@@ -5,10 +5,10 @@ export class CreateFormDto {
   @IsNotEmpty()
   @IsString()
   @ApiProperty({
-    description: 'Form title',
+    description: 'Form name',
     example: 'Machine learning Seminar',
   })
-  title: string;
+  name: string;
 
   @IsNotEmpty()
   @IsString()

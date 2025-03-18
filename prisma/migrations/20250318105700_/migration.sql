@@ -395,7 +395,7 @@ CREATE TABLE "forms" (
     "updated_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "deleted_at" TIMESTAMP(3),
     "status" SMALLINT DEFAULT 1,
-    "title" TEXT,
+    "name" TEXT,
     "description" TEXT,
     "tenant_id" TEXT,
     "workspace_id" TEXT,
