@@ -23,6 +23,13 @@ export class FormService extends PrismaClient {
       const form = await this.prisma.form.findUnique({
         where: { id },
       });
+
+      if (!form) {
+        return {
+          success: false,
+          message: 'Form not found',
+        };
+      }
       return {
         success: true,
         data: form,
@@ -37,49 +44,6 @@ export class FormService extends PrismaClient {
 
   update(id: number, updateFormDto: UpdateFormDto) {
     return `This action updates a #${id} form`;
-  }
-
-  async submitForm(id: string, data: any) {
-    try {
-      const form = await this.prisma.form.findUnique({
-        where: { id },
-      });
-      if (!form) {
-        return {
-          success: false,
-          message: 'Form not found',
-        };
-      }
-      await this.prisma.response.create({
-        data: {
-          form_id: form.id,
-          responses: JSON.stringify(data),
-        },
-      });
-      // const fields = form.fields;
-      // const fieldData = fields.map((field) => {
-      //   return {
-      //     [field.name]: data[field.name],
-      //   };
-      // });
-      // const formData = {
-      //   ...form,
-      //   ...fieldData,
-      // };
-      // const formSubmission = await this.prisma.formSubmission.create({
-      //   data: formData,
-      // });
-
-      return {
-        success: true,
-        message: 'Form submitted successfully',
-      };
-    } catch (error) {
-      return {
-        success: false,
-        message: error.message,
-      };
-    }
   }
 
   remove(id: number) {
