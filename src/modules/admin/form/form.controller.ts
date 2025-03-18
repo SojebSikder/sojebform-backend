@@ -19,10 +19,7 @@ export class FormController {
   async create(@Body() createFormDto: CreateFormDto) {
     try {
       const form = await this.formService.create(createFormDto);
-      return {
-        success: true,
-        data: form,
-      };
+      return form;
     } catch (error) {
       return {
         success: false,
@@ -35,10 +32,7 @@ export class FormController {
   async findAll() {
     try {
       const forms = await this.formService.findAll();
-      return {
-        success: true,
-        data: forms,
-      };
+      return forms;
     } catch (error) {
       return {
         success: false,
@@ -51,10 +45,7 @@ export class FormController {
   async findOne(@Param('id') id: string) {
     try {
       const form = await this.formService.findOne(id);
-      return {
-        success: true,
-        data: form,
-      };
+      return form;
     } catch (error) {
       return {
         success: false,
@@ -67,10 +58,7 @@ export class FormController {
   async update(@Param('id') id: string, @Body() updateFormDto: UpdateFormDto) {
     try {
       const form = await this.formService.update(id, updateFormDto);
-      return {
-        success: true,
-        data: form,
-      };
+      return form;
     } catch (error) {
       return {
         success: false,
@@ -83,10 +71,7 @@ export class FormController {
   async remove(@Param('id') id: string) {
     try {
       const form = await this.formService.remove(id);
-      return {
-        success: true,
-        data: form,
-      };
+      return form
     } catch (error) {
       return {
         success: false,
