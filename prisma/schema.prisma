@@ -514,8 +514,8 @@ model Form {
   title       String?
   description String? @db.Text
 
-  fields    Field[]
-  responses Response[]
+  elements    Element[]
+  submissions Submission[]
 
   tenant_id String?
   tenant    Organization? @relation(fields: [tenant_id], references: [id], onDelete: Cascade)
@@ -526,8 +526,8 @@ model Form {
   @@map("forms")
 }
 
-// this table stores field
-model Field {
+// this table stores form element
+model Element {
   id         String    @id @default(cuid())
   created_at DateTime  @default(now())
   updated_at DateTime  @default(now())
@@ -537,17 +537,18 @@ model Field {
   form_id String
   form    Form?  @relation(fields: [form_id], references: [id], onDelete: Cascade)
 
-  type        String?
-  label       String?
-  placeholder String?
-  required    Boolean? @default(false)
-  options     Json?
+  type             String?
+  // label       String?
+  // placeholder String?
+  // required    Boolean? @default(false)
+  // options     Json?
+  extra_attributes Json?
 
-  @@map("fields")
+  @@map("elements")
 }
 
 // this table stores form
-model Response {
+model Submission {
   id         String    @id @default(cuid())
   created_at DateTime  @default(now())
   updated_at DateTime  @default(now())
@@ -557,9 +558,9 @@ model Response {
   form_id String
   form    Form?  @relation(fields: [form_id], references: [id], onDelete: Cascade)
 
-  responses Json?
+  data Json?
 
-  @@map("responses")
+  @@map("submissions")
 }
 
 // this table stores example
