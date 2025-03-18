@@ -12,13 +12,17 @@ export class FormService extends PrismaClient {
 
   async create(createFormDto: CreateFormDto) {
     try {
+      const name = createFormDto.name;
+      const description = createFormDto.description;
+      const elements = createFormDto.elements;
+
       const form = await this.prisma.form.create({
         data: {
-          name: createFormDto.name,
-          description: createFormDto.description,
+          name: name,
+          description: description,
           elements: {
             // create: JSON.parse(createFormDto.elements),
-            create: createFormDto.elements,
+            create: elements,
           },
         },
       });
@@ -104,6 +108,39 @@ export class FormService extends PrismaClient {
             // update: JSON.parse(updateFormDto.elements),
             update: updateFormDto.elements,
           },
+        },
+      });
+      return {
+        success: true,
+        data: form,
+      };
+    } catch (error) {
+      return {
+        success: false,
+        message: error.message,
+      };
+    }
+  }
+
+  async toggleStatus(id: string) {
+    try {
+      const existingForm = await this.prisma.form.findUnique({
+        where: {
+          id: id,
+        },
+      });
+
+      if (!existingForm) {
+        return {
+          success: false,
+          message: 'Form not found',
+        };
+      }
+
+      const form = await this.prisma.form.update({
+        where: { id },
+        data: {
+          status: existingForm.status == 1 ? 0 : 1,
         },
       });
       return {

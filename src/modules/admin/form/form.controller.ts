@@ -67,11 +67,24 @@ export class FormController {
     }
   }
 
+  @Patch(':id/status')
+  async toggleStatus(@Param('id') id: string) {
+    try {
+      const form = await this.formService.toggleStatus(id);
+      return form;
+    } catch (error) {
+      return {
+        success: false,
+        message: error.message,
+      };
+    }
+  }
+
   @Delete(':id')
   async remove(@Param('id') id: string) {
     try {
       const form = await this.formService.remove(id);
-      return form
+      return form;
     } catch (error) {
       return {
         success: false,
