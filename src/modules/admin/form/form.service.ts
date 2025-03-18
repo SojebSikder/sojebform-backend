@@ -12,15 +12,20 @@ export class FormService extends PrismaClient {
 
   async create(createFormDto: CreateFormDto) {
     try {
-      return this.prisma.form.create({
+      const form = await this.prisma.form.create({
         data: {
           title: createFormDto.title,
           description: createFormDto.description,
-          fields: {
-            create: JSON.parse(createFormDto.fields),
+          elements: {
+            // create: JSON.parse(createFormDto.elements),
+            create: createFormDto.elements,
           },
         },
       });
+      return {
+        success: true,
+        message: 'Form created successfully',
+      };
     } catch (error) {
       return {
         success: false,
@@ -33,7 +38,10 @@ export class FormService extends PrismaClient {
     try {
       const forms = await this.prisma.form.findMany({
         include: {
-          fields: true,
+          elements: true,
+        },
+        orderBy: {
+          updated_at: 'desc',
         },
       });
       return {
@@ -53,6 +61,13 @@ export class FormService extends PrismaClient {
       const form = await this.prisma.form.findUnique({
         where: { id },
       });
+
+      if (!form) {
+        return {
+          success: false,
+          message: 'Form not found',
+        };
+      }
       return {
         success: true,
         data: form,
@@ -67,13 +82,27 @@ export class FormService extends PrismaClient {
 
   async update(id: string, updateFormDto: UpdateFormDto) {
     try {
+      const existingForm = await this.prisma.form.findUnique({
+        where: {
+          id: id,
+        },
+      });
+
+      if (!existingForm) {
+        return {
+          success: false,
+          message: 'Form not found',
+        };
+      }
+
       const form = await this.prisma.form.update({
         where: { id },
         data: {
           title: updateFormDto.title,
           description: updateFormDto.description,
-          fields: {
-            update: JSON.parse(updateFormDto.fields),
+          elements: {
+            // update: JSON.parse(updateFormDto.elements),
+            update: updateFormDto.elements,
           },
         },
       });
@@ -91,6 +120,19 @@ export class FormService extends PrismaClient {
 
   async remove(id: string) {
     try {
+      const existingForm = await this.prisma.form.findUnique({
+        where: {
+          id: id,
+        },
+      });
+
+      if (!existingForm) {
+        return {
+          success: false,
+          message: 'Form not found',
+        };
+      }
+
       await this.prisma.form.delete({
         where: { id },
       });

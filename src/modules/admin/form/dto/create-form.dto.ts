@@ -21,8 +21,8 @@ export class CreateFormDto {
   @IsNotEmpty()
   @IsString()
   @ApiProperty({
-    description: 'Form fields',
+    description: 'Form elements',
     example: '{"name": "text", "label": "Name", "required": true}',
   })
-  fields: string;
+  elements: any;
 }
