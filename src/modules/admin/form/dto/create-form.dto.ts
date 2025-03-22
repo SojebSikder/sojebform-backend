@@ -10,18 +10,16 @@ export class CreateFormDto {
   })
   name: string;
 
-  @IsNotEmpty()
-  @IsString()
   @ApiProperty({
     description: 'Form description',
     example: 'Machine learning Seminar',
   })
-  description: string;
+  description?: string;
 
   @IsNotEmpty()
   @ApiProperty({
     description: 'Form elements',
-    example: '{"name": "text", "label": "Name", "required": true}',
+    example: '[{"name": "text", "label": "Name", "required": true}]',
   })
   elements: any[];
 }

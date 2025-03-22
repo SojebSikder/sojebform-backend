@@ -48,6 +48,7 @@ export class FormService extends PrismaClient {
           updated_at: 'desc',
         },
       });
+
       return {
         success: true,
         data: forms,
@@ -64,6 +65,9 @@ export class FormService extends PrismaClient {
     try {
       const form = await this.prisma.form.findUnique({
         where: { id },
+        select: {
+          elements: true,
+        },
       });
 
       if (!form) {
