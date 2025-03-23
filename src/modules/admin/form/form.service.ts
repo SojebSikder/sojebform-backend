@@ -69,6 +69,7 @@ export class FormService extends PrismaClient {
           id: true,
           name: true,
           description: true,
+          status: true,
           elements: true,
         },
       });

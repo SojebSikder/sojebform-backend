@@ -22,6 +22,13 @@ export class FormService extends PrismaClient {
     try {
       const form = await this.prisma.form.findUnique({
         where: { id },
+        select: {
+          id: true,
+          name: true,
+          description: true,
+          status: true,
+          elements: true,
+        },
       });
 
       if (!form) {
