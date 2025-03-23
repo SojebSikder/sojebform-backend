@@ -60,11 +60,10 @@ export class FormController {
       const form = await this.formService.update(id, updateFormDto);
       return form;
     } catch (error) {
-      throw error;
-      // return {
-      //   success: false,
-      //   message: error.message,
-      // };
+      return {
+        success: false,
+        message: error.message,
+      };
     }
   }
 

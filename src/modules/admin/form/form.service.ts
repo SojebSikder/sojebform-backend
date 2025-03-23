@@ -159,14 +159,14 @@ export class FormService extends PrismaClient {
 
       return {
         success: true,
+        message: 'Form updated successfully',
         data: form,
       };
     } catch (error) {
-      // return {
-      //   success: false,
-      //   message: error.message,
-      // };
-      throw error;
+      return {
+        success: false,
+        message: error.message,
+      };
     }
   }
 

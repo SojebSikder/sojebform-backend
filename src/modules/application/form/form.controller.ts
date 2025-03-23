@@ -1,4 +1,12 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+} from '@nestjs/common';
 import { FormService } from './form.service';
 import { CreateFormDto } from './dto/create-form.dto';
 import { UpdateFormDto } from './dto/update-form.dto';
@@ -18,8 +26,16 @@ export class FormController {
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.formService.findOne(id);
+  async findOne(@Param('id') id: string) {
+    try {
+      const form = await this.formService.findOne(id);
+      return form;
+    } catch (error) {
+      return {
+        success: false,
+        message: error.message,
+      };
+    }
   }
 
   @Patch(':id')
