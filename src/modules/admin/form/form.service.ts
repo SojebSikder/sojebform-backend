@@ -16,12 +16,18 @@ export class FormService extends PrismaClient {
       const description = createFormDto.description;
       const elements = createFormDto.elements;
 
-      const form = await this.prisma.form.create({
+      const data = {};
+      if (name) {
+        data['name'] = name;
+      }
+      if (description) {
+        data['description'] = description;
+      }
+
+      await this.prisma.form.create({
         data: {
-          name: name,
-          description: description,
+          ...data,
           elements: {
-            // create: JSON.parse(createFormDto.elements),
             create: elements,
           },
         },
@@ -107,26 +113,60 @@ export class FormService extends PrismaClient {
         };
       }
 
+      const name = updateFormDto.name;
+      const description = updateFormDto.description;
+      const elements = updateFormDto.elements;
+
+      const data = {};
+      if (name) {
+        data['name'] = name;
+      }
+      if (description) {
+        data['description'] = description;
+      }
+
+      const updatedElements = [];
+
+      elements.forEach((element) => {
+        if (element.id) {
+          updatedElements.push({
+            where: {
+              id: element.id,
+            },
+            update: {
+              type: element.type,
+              extra_attributes: element.extra_attributes,
+            },
+            create: {
+              type: element.type,
+              extra_attributes: element.extra_attributes,
+            },
+          });
+        } else {
+          updatedElements.push(element);
+        }
+      });
+
       const form = await this.prisma.form.update({
         where: { id },
         data: {
-          name: updateFormDto.name,
-          description: updateFormDto.description,
+          ...data,
           elements: {
-            // update: JSON.parse(updateFormDto.elements),
-            update: updateFormDto.elements,
+            upsert: updatedElements,
           },
         },
       });
+
       return {
         success: true,
         data: form,
       };
     } catch (error) {
-      return {
-        success: false,
-        message: error.message,
-      };
+      // return {
+      //   success: false,
+      //   message: error.message,
+      // };
+      throw error;
     }
   }
 
