@@ -50,7 +50,7 @@ export class SubmissionService extends PrismaClient {
       // create submission
       await this.prisma.submission.create({
         data: {
-          form_id: '',
+          form_id: form_id,
           data: submission_data,
         },
       });
