@@ -2,7 +2,7 @@
 
 No-code form builder backend system
 
-Frontend part: (Link will be here soon)
+Frontend part: https://github.com/SojebSikder/sojebform-frontend
 
 ## Config
 
@@ -34,7 +34,7 @@ yarn install
 
 ## Setup
 
-Copy .env.example to .env and config according to your needs.
+Copy `.env.example` to `.env` and config according to your needs.
 
 Migrate database:
 
