@@ -42,6 +42,18 @@ CREATE TABLE "workspace_users" (
 );
 
 -- CreateTable
+CREATE TABLE "workspace_forms" (
+    "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updated_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "deleted_at" TIMESTAMP(3),
+    "workspace_id" TEXT NOT NULL,
+    "form_id" TEXT NOT NULL,
+    "tenant_id" TEXT NOT NULL,
+
+    CONSTRAINT "workspace_forms_pkey" PRIMARY KEY ("workspace_id","form_id")
+);
+
+-- CreateTable
 CREATE TABLE "Account" (
     "id" TEXT NOT NULL,
     "user_id" TEXT NOT NULL,
@@ -467,6 +479,15 @@ ALTER TABLE "workspace_users" ADD CONSTRAINT "workspace_users_user_id_fkey" FORE
 
 -- AddForeignKey
 ALTER TABLE "workspace_users" ADD CONSTRAINT "workspace_users_tenant_id_fkey" FOREIGN KEY ("tenant_id") REFERENCES "organizations"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "workspace_forms" ADD CONSTRAINT "workspace_forms_workspace_id_fkey" FOREIGN KEY ("workspace_id") REFERENCES "workspaces"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "workspace_forms" ADD CONSTRAINT "workspace_forms_form_id_fkey" FOREIGN KEY ("form_id") REFERENCES "forms"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "workspace_forms" ADD CONSTRAINT "workspace_forms_tenant_id_fkey" FOREIGN KEY ("tenant_id") REFERENCES "organizations"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "Account" ADD CONSTRAINT "Account_user_id_fkey" FOREIGN KEY ("user_id") REFERENCES "users"("id") ON DELETE CASCADE ON UPDATE CASCADE;

@@ -26,12 +26,33 @@ export class SeedCommand extends CommandRunner {
         await this.permissionSeed();
         await this.userSeed();
         await this.permissionRoleSeed();
+        // subscription and plan seed
+        await this.planSeed();
       });
 
       console.log('Seeding done.');
     } catch (error) {
       throw error;
     }
+  }
+
+  //---- subscription plan section ----
+  async planSeed() {
+    // system admin, user id: 1
+    await this.prisma.plan.createMany({
+      data: [
+        {
+          name: 'Team',
+          plan_price_id: 'price_1MEvhxJ1sD6uaGBLDQ2DqVEK',
+          price_per_month: 10,
+        },
+        {
+          name: 'Business',
+          plan_price_id: 'price_1MEviEJ1sD6uaGBLIbqAWP2Z',
+          price_per_month: 30,
+        },
+      ],
+    });
   }
 
   //---- user section ----
@@ -55,11 +76,35 @@ export class SeedCommand extends CommandRunner {
     let i = 0;
     const permissions = [];
     const permissionGroups = [
-      // (system level )super admin level permission
-      { title: 'system_tenant_management', subject: 'SystemTenant' },
+      // (system level) super admin level permission
+      { title: 'organization', subject: 'Organization' },
+      { title: 'tenant', subject: 'Tenant' },
       // end (system level )super admin level permission
-      { title: 'user_management', subject: 'User' },
-      { title: 'role_management', subject: 'Role' },
+      // Workspace
+      { title: 'workspace', subject: 'Workspace' },
+      { title: 'workspace_user', subject: 'WorkspaceUser' },
+      // { title: 'workspace_team', subject: 'WorkspaceTeam' },
+      { title: 'workspace_form', subject: 'WorkspaceForm' },
+      {
+        title: 'workspace_broadcast',
+        subject: 'WorkspaceBroadcast',
+      },
+      {
+        title: 'workspace_workflow',
+        subject: 'WorkspaceWorkflow',
+      },
+      {
+        title: 'workspace_report',
+        subject: 'WorkspaceReport',
+        scope: ['read', 'show'],
+      },
+      {
+        title: 'workspace_data_backup',
+        subject: 'WorkspaceDataBackup',
+        scope: ['read', 'create'],
+      },
+      { title: 'user', subject: 'User' },
+      { title: 'role', subject: 'Role' },
       // Project
       { title: 'Project', subject: 'Project' },
       // Task
@@ -68,8 +113,6 @@ export class SeedCommand extends CommandRunner {
         subject: 'Task',
         scope: ['read', 'create', 'update', 'show', 'delete', 'assign'],
       },
-      // Comment
-      { title: 'Comment', subject: 'Comment' },
     ];
 
     for (const permissionGroup of permissionGroups) {
@@ -107,10 +150,10 @@ export class SeedCommand extends CommandRunner {
 
   async permissionRoleSeed() {
     const all_permissions = await this.prisma.permission.findMany();
-    const su_admin_permissions = all_permissions.filter(function (permission) {
-      return permission.title.substring(0, 25) == 'system_tenant_management_';
-    });
-    // const su_admin_permissions = all_permissions;
+    // const su_admin_permissions = all_permissions.filter(function (permission) {
+    //   return permission.title.substring(0, 13) == 'system_tenant_';
+    // });
+    const su_admin_permissions = all_permissions;
 
     // -----su admin permission---
     const adminPermissionRoleArray = [];
@@ -128,7 +171,7 @@ export class SeedCommand extends CommandRunner {
     // ---admin---
     const project_admin_permissions = all_permissions.filter(
       function (permission) {
-        return permission.title.substring(0, 25) != 'system_tenant_management_';
+        return permission.title.substring(0, 13) != 'system_tenant_';
       },
     );
 
@@ -144,40 +187,14 @@ export class SeedCommand extends CommandRunner {
     });
     // -----------
 
-    // ---project manager---
-    const project_manager_permissions = all_permissions.filter(
-      function (permission) {
-        return (
-          permission.title == 'project_read' ||
-          permission.title == 'project_show' ||
-          permission.title == 'project_update' ||
-          permission.title.substring(0, 4) == 'Task' ||
-          permission.title.substring(0, 7) == 'Comment'
-        );
-      },
-    );
-
-    const projectManagerPermissionRoleArray = [];
-    for (const project_manager_permission of project_manager_permissions) {
-      projectManagerPermissionRoleArray.push({
-        role_id: '3',
-        permission_id: project_manager_permission.id,
-      });
-    }
-    await this.prisma.permissionRole.createMany({
-      data: projectManagerPermissionRoleArray,
-    });
-    // -----------
-
     // ---member---
     const member_permissions = all_permissions.filter(function (permission) {
       return (
-        permission.title == 'project_read' ||
-        permission.title == 'project_show' ||
-        permission.title == 'task_read' ||
-        permission.title == 'task_show' ||
-        permission.title == 'task_update' ||
-        permission.title.substring(0, 7) == 'comment'
+        permission.title == 'form_read' ||
+        permission.title == 'form_create' ||
+        permission.title == 'form_update' ||
+        permission.title == 'form_show' ||
+        permission.title == 'form_delete'
       );
     });
 
@@ -190,28 +207,6 @@ export class SeedCommand extends CommandRunner {
     }
     await this.prisma.permissionRole.createMany({
       data: memberPermissionRoleArray,
-    });
-    // -----------
-
-    // ---viewer---
-    const viewer_permissions = all_permissions.filter(function (permission) {
-      return (
-        permission.title == 'project_read' ||
-        permission.title == 'project_show' ||
-        permission.title == 'task_read' ||
-        permission.title == 'comment_read'
-      );
-    });
-
-    const viewerPermissionRoleArray = [];
-    for (const viewer_permission of viewer_permissions) {
-      viewerPermissionRoleArray.push({
-        role_id: '5',
-        permission_id: viewer_permission.id,
-      });
-    }
-    await this.prisma.permissionRole.createMany({
-      data: viewerPermissionRoleArray,
     });
     // -----------
   }
@@ -233,18 +228,8 @@ export class SeedCommand extends CommandRunner {
         },
         {
           id: '3',
-          title: 'Project Manager',
-          name: 'project_manager',
-        },
-        {
-          id: '4',
           title: 'Member',
           name: 'member',
-        },
-        {
-          id: '5',
-          title: 'Viewer',
-          name: 'viewer',
         },
       ],
     });
