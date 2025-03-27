@@ -1,20 +1,31 @@
 import { Injectable } from '@nestjs/common';
 import { CreateFormDto } from './dto/create-form.dto';
 import { UpdateFormDto } from './dto/update-form.dto';
-import { PrismaClient } from '@prisma/client';
-import { PrismaService } from '../../../prisma/prisma.service';
+import { PrismaService } from '../../../../prisma/prisma.service';
+import { UserRepository } from '../../../../common/repository/user/user.repository';
 
 @Injectable()
-export class FormService extends PrismaClient {
-  constructor(private readonly prisma: PrismaService) {
-    super();
-  }
+export class FormService {
+  constructor(private readonly prisma: PrismaService) {}
 
-  async create(createFormDto: CreateFormDto) {
+  async create(
+    user_id: string,
+    workspace_id: string,
+    createFormDto: CreateFormDto,
+  ) {
     try {
+      if (!workspace_id) {
+        return {
+          success: false,
+          message: 'workspace_id is require',
+        };
+      }
+
       const name = createFormDto.name;
       const description = createFormDto.description;
       const elements = createFormDto.elements;
+
+      const tenant_id = await UserRepository.getTenantId(user_id);
 
       const data = {};
       if (name) {
@@ -27,6 +38,8 @@ export class FormService extends PrismaClient {
       await this.prisma.form.create({
         data: {
           ...data,
+          workspace_id: workspace_id,
+          tenant_id: tenant_id,
           elements: {
             create: elements,
           },
@@ -44,9 +57,14 @@ export class FormService extends PrismaClient {
     }
   }
 
-  async findAll() {
+  async findAll(user_id: string, workspace_id: string) {
     try {
+      const tenant_id = await UserRepository.getTenantId(user_id);
       const forms = await this.prisma.form.findMany({
+        where: {
+          workspace_id: workspace_id,
+          tenant_id: tenant_id,
+        },
         include: {
           elements: true,
         },
@@ -67,10 +85,15 @@ export class FormService extends PrismaClient {
     }
   }
 
-  async findOne(id: string) {
+  async findOne(id: string, user_id: string, workspace_id: string) {
     try {
+      const tenant_id = await UserRepository.getTenantId(user_id);
       const form = await this.prisma.form.findUnique({
-        where: { id },
+        where: {
+          id: id,
+          workspace_id: workspace_id,
+          tenant_id: tenant_id,
+        },
         select: {
           id: true,
           name: true,
@@ -98,11 +121,19 @@ export class FormService extends PrismaClient {
     }
   }
 
-  async update(id: string, updateFormDto: UpdateFormDto) {
+  async update(
+    id: string,
+    updateFormDto: UpdateFormDto,
+    user_id: string,
+    workspace_id: string,
+  ) {
     try {
+      const tenant_id = await UserRepository.getTenantId(user_id);
       const existingForm = await this.prisma.form.findUnique({
         where: {
           id: id,
+          workspace_id: workspace_id,
+          tenant_id: tenant_id,
         },
       });
 
@@ -170,11 +201,14 @@ export class FormService extends PrismaClient {
     }
   }
 
-  async toggleStatus(id: string) {
+  async toggleStatus(id: string, user_id: string, workspace_id: string) {
     try {
+      const tenant_id = await UserRepository.getTenantId(user_id);
       const existingForm = await this.prisma.form.findUnique({
         where: {
           id: id,
+          workspace_id: workspace_id,
+          tenant_id: tenant_id,
         },
       });
 
@@ -186,7 +220,11 @@ export class FormService extends PrismaClient {
       }
 
       const form = await this.prisma.form.update({
-        where: { id },
+        where: {
+          id: id,
+          workspace_id: workspace_id,
+          tenant_id: tenant_id,
+        },
         data: {
           status: existingForm.status == 1 ? 0 : 1,
         },
@@ -203,11 +241,14 @@ export class FormService extends PrismaClient {
     }
   }
 
-  async remove(id: string) {
+  async remove(id: string, user_id: string, workspace_id: string) {
     try {
+      const tenant_id = await UserRepository.getTenantId(user_id);
       const existingForm = await this.prisma.form.findUnique({
         where: {
           id: id,
+          workspace_id: workspace_id,
+          tenant_id: tenant_id,
         },
       });
 
@@ -219,7 +260,11 @@ export class FormService extends PrismaClient {
       }
 
       await this.prisma.form.delete({
-        where: { id },
+        where: {
+          id: id,
+          workspace_id: workspace_id,
+          tenant_id: tenant_id,
+        },
       });
       return {
         success: true,

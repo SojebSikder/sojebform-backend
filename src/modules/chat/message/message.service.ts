@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { MessageStatus, PrismaClient } from '@prisma/client';
+import { MessageStatus } from '@prisma/client';
 import appConfig from '../../../config/app.config';
 import { CreateMessageDto } from './dto/create-message.dto';
 import { PrismaService } from '../../../prisma/prisma.service';
@@ -11,13 +11,11 @@ import { UserRepository } from '../../../common/repository/user/user.repository'
 import { Role } from 'src/common/guard/role/role.enum';
 
 @Injectable()
-export class MessageService extends PrismaClient {
+export class MessageService {
   constructor(
     private prisma: PrismaService,
     private readonly messageGateway: MessageGateway,
-  ) {
-    super();
-  }
+  ) {}
 
   async create(user_id: string, createMessageDto: CreateMessageDto) {
     try {

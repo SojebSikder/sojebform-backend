@@ -1,24 +1,27 @@
 import { Injectable } from '@nestjs/common';
-import { CreateSubmissionDto } from './dto/create-submission.dto';
-import { UpdateSubmissionDto } from './dto/update-submission.dto';
-import { PrismaClient } from '@prisma/client';
-import { PrismaService } from 'src/prisma/prisma.service';
+import { PrismaService } from '../../../../prisma/prisma.service';
+import { UserRepository } from '../../../../common/repository/user/user.repository';
 
 @Injectable()
-export class SubmissionService extends PrismaClient {
-  constructor(private readonly prisma: PrismaService) {
-    super();
-  }
+export class SubmissionService {
+  constructor(private readonly prisma: PrismaService) {}
 
-  create(createSubmissionDto: CreateSubmissionDto) {
-    return 'This action adds a new submission';
-  }
-
-  async findAll({ form_id }: { form_id: string }) {
+  async findAll({
+    form_id,
+    user_id,
+    workspace_id,
+  }: {
+    form_id: string;
+    user_id: string;
+    workspace_id: string;
+  }) {
     try {
+      const tenant_id = await UserRepository.getTenantId(user_id);
       const form = await this.prisma.form.findUnique({
         where: {
           id: form_id,
+          tenant_id: tenant_id,
+          workspace_id: workspace_id,
         },
       });
 
@@ -79,10 +82,6 @@ export class SubmissionService extends PrismaClient {
         message: error.message,
       };
     }
-  }
-
-  update(id: number, updateSubmissionDto: UpdateSubmissionDto) {
-    return `This action updates a #${id} submission`;
   }
 
   async remove(id: string) {

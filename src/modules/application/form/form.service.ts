@@ -1,14 +1,11 @@
 import { Injectable } from '@nestjs/common';
 import { CreateFormDto } from './dto/create-form.dto';
 import { UpdateFormDto } from './dto/update-form.dto';
-import { PrismaClient } from '@prisma/client';
 import { PrismaService } from '../../../prisma/prisma.service';
 
 @Injectable()
-export class FormService extends PrismaClient {
-  constructor(private readonly prisma: PrismaService) {
-    super();
-  }
+export class FormService {
+  constructor(private readonly prisma: PrismaService) {}
 
   create(createFormDto: CreateFormDto) {
     return 'This action adds a new form';

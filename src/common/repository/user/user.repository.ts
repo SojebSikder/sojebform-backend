@@ -62,6 +62,54 @@ export class UserRepository {
     return user;
   }
 
+  static async getUserByBillingID(billingID: string) {
+    const user = await prisma.user.findFirst({
+      where: {
+        billing_id: billingID,
+      },
+      include: {
+        tenant: true,
+        subscriptions: {
+          include: {
+            plan: true,
+          },
+        },
+      },
+    });
+    return user;
+  }
+
+  /**
+   * get user tenant id
+   * @returns
+   */
+  static async getTenantId(userId: string) {
+    const userDetails = await this.getUserDetails(userId);
+    const tenant_id = userDetails.tenant_id ?? userDetails.id;
+
+    return tenant_id;
+  }
+
+  /**
+   * check tenant ownership
+   * @returns
+   */
+  static async checkTenant({ model, userId }: { model: any; userId: string }) {
+    const userDetails = await this.getUserDetails(userId);
+    const tenant_id = userDetails.tenant_id ?? userDetails.id;
+
+    const check = await model.findFirst({
+      where: {
+        tenant_id: tenant_id,
+      },
+    });
+    if (check) {
+      return userDetails;
+    } else {
+      return false;
+    }
+  }
+
   /**
    * Check existance
    * @returns

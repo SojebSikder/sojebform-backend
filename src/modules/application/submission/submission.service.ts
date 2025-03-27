@@ -1,14 +1,11 @@
 import { Injectable } from '@nestjs/common';
 import { CreateSubmissionDto } from './dto/create-submission.dto';
 import { UpdateSubmissionDto } from './dto/update-submission.dto';
-import { PrismaClient } from '@prisma/client';
 import { PrismaService } from 'src/prisma/prisma.service';
 
 @Injectable()
-export class SubmissionService extends PrismaClient {
-  constructor(private readonly prisma: PrismaService) {
-    super();
-  }
+export class SubmissionService {
+  constructor(private readonly prisma: PrismaService) {}
 
   async create(createSubmissionDto: CreateSubmissionDto) {
     try {

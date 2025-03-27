@@ -5,9 +5,8 @@ import { WebsiteInfoModule } from './website-info/website-info.module';
 import { PaymentTransactionModule } from './payment-transaction/payment-transaction.module';
 import { UserModule } from './user/user.module';
 import { NotificationModule } from './notification/notification.module';
-import { FormModule } from './form/form.module';
 import { ExampleModule } from './example/example.module';
-import { SubmissionModule } from './submission/submission.module';
+import { SpaceModule } from './space/space.module';
 
 @Module({
   imports: [
@@ -17,9 +16,8 @@ import { SubmissionModule } from './submission/submission.module';
     PaymentTransactionModule,
     UserModule,
     NotificationModule,
-    FormModule,
     ExampleModule,
-    SubmissionModule,
+    SpaceModule,
   ],
 })
 export class AdminModule {}

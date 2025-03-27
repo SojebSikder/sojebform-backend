@@ -541,8 +541,9 @@ model Form {
   tenant_id String?
   tenant    Organization? @relation(fields: [tenant_id], references: [id], onDelete: Cascade)
 
-  workspace_id    String?
-  workspaces      Workspace?      @relation(fields: [workspace_id], references: [id])
+  workspace_id String?
+  workspaces   Workspace? @relation(fields: [workspace_id], references: [id])
+
   workspace_forms WorkspaceForm[]
 
   @@map("forms")
